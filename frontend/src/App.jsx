@@ -78,7 +78,7 @@ DISCLAIMER: Medcentric AI is an educational demonstrator and prototype. This rep
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 flex flex-col items-center">
+    <div className="min-h-screen bg-blue-50 p-4 sm:p-6 flex flex-col items-center">
       {/* App Header */}
       <header className="mb-6 text-center mt-2">
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Medcentric AI</h1>
