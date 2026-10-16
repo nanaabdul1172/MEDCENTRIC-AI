@@ -9,6 +9,13 @@ export default function App() {
     oldpeak: 1.5,
     exang_True: 1,
     slope_flat: 1,
+    // Additional features with defaults (to match backend schema)
+    fbs_True: 0,
+    restecg_normal: 1,
+    restecg_st_abnomality: 0,
+    slope_upsloping: 0,
+    thal_normal: 1,
+    thal_reversable_defect: 0,
   });
 
   const [result, setResult] = useState(null);
@@ -50,17 +57,28 @@ export default function App() {
     if (!result) return;
     const reportContent = `--- MEDCENTRIC AI CLINICAL ASSESSMENT REPORT ---
 Timestamp: ${new Date().toLocaleString()}
+
+⚠️ DISCLAIMER: This is an educational prototype. Not for clinical use.
+
 Patient Vitals:
 - Age: ${formData.age} yrs
 - Resting BP: ${formData.trestbps} mmHg
 - Cholesterol: ${formData.chol} mg/dl
 - Max Heart Rate: ${formData.thalch} bpm
 - Oldpeak: ${formData.oldpeak}
+
+Clinical Indicators:
+- Fasting Blood Sugar > 120 mg/dl: ${formData.fbs_True ? 'Yes' : 'No'}
 - Exercise Induced Angina: ${formData.exang_True ? 'Yes' : 'No'}
-- ST Slope (Flat): ${formData.slope_flat ? 'Yes' : 'No'}
+- ST Slope: ${formData.slope_flat ? 'Flat' : (formData.slope_upsloping ? 'Upsloping' : 'Downsloping')}
 
 Assessment Result: ${result.status}
 Confidence Score: ${result.confidence}%
+
+This assessment is based on a Random Forest machine learning model 
+trained on the UCI Heart Disease dataset (85.87% accuracy on test set).
+
+IMPORTANT: Consult a qualified healthcare professional for medical advice.
 ---------------------------------------------`;
 
     const blob = new Blob([reportContent], { type: 'text/plain' });
@@ -73,7 +91,22 @@ Confidence Score: ${result.confidence}%
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center">
-      <header className="mb-8 text-center mt-4">
+      {/* Clinical Disclaimer & Safety Notice Banner */}
+      <div className="w-full max-w-3xl mb-6 mt-4 bg-amber-50 border-2 border-amber-400 rounded-xl p-4 shadow-md">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 text-2xl mt-0.5">⚠️</div>
+          <div>
+            <h2 className="text-base font-bold text-amber-900 mb-1">
+              Clinical Disclaimer & Safety Notice
+            </h2>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              <strong>Medcentric AI is an educational prototype and research demonstration.</strong> This system is <strong>NOT a medical diagnostic tool</strong> and should <strong>NEVER be used for clinical decision-making or patient care</strong>. All predictions are statistical estimates based on historical data and must not replace professional medical evaluation, testing, or physician consultation. If you are experiencing a medical emergency, call 911 immediately.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <header className="mb-8 text-center">
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Medcentric AI</h1>
         <p className="text-slate-600 mt-1">Advanced Cardiovascular Risk Assessment Dashboard</p>
       </header>
@@ -102,6 +135,46 @@ Confidence Score: ${result.confidence}%
             <div>
               <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Oldpeak</label>
               <input type="number" step="0.1" name="oldpeak" value={formData.oldpeak} onChange={handleChange} className="w-full p-2.5 border rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Fasting Blood Sugar &gt; 120 mg/dl</label>
+              <select name="fbs_True" value={formData.fbs_True} onChange={handleChange} className="w-full p-2.5 border rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white">
+                <option value={0}>No</option>
+                <option value={1}>Yes</option>
+              </select>
+            </div>
+
+            <div className="sm:col-span-2 border-t pt-4 mt-2">
+              <h3 className="text-xs font-bold uppercase text-slate-700 mb-3">Clinical Indicators</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">Exercise Induced Angina</label>
+                  <select name="exang_True" value={formData.exang_True} onChange={handleChange} className="w-full p-2.5 border rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white">
+                    <option value={0}>No</option>
+                    <option value={1}>Yes</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase text-slate-600 mb-1">ST Slope Type</label>
+                  <select 
+                    name="slope_type" 
+                    value={formData.slope_flat ? 'flat' : (formData.slope_upsloping ? 'upsloping' : 'downsloping')} 
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData({
+                        ...formData,
+                        slope_flat: value === 'flat' ? 1 : 0,
+                        slope_upsloping: value === 'upsloping' ? 1 : 0,
+                      });
+                    }}
+                    className="w-full p-2.5 border rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+                  >
+                    <option value="downsloping">Downsloping</option>
+                    <option value="flat">Flat</option>
+                    <option value="upsloping">Upsloping</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div className="sm:col-span-2 mt-4">
@@ -141,7 +214,7 @@ Confidence Score: ${result.confidence}%
                   onClick={downloadReport} 
                   className="w-full bg-slate-800 text-white p-2.5 rounded-lg text-xs font-semibold hover:bg-slate-900 transition"
                 >
-                  Download Report (.txt)
+                  Download Report (.doc)
                 </button>
               </div>
             ) : (
@@ -163,6 +236,7 @@ Confidence Score: ${result.confidence}%
                   <th className="p-2.5">Age</th>
                   <th className="p-2.5">BP</th>
                   <th className="p-2.5">Chol</th>
+                  <th className="p-2.5">FBS</th>
                   <th className="p-2.5">Status</th>
                   <th className="p-2.5">Confidence</th>
                 </tr>
@@ -174,6 +248,7 @@ Confidence Score: ${result.confidence}%
                     <td className="p-2.5">{item.age}</td>
                     <td className="p-2.5">{item.trestbps}</td>
                     <td className="p-2.5">{item.chol}</td>
+                    <td className="p-2.5">{item.fbs_True ? 'Y' : 'N'}</td>
                     <td className={`p-2.5 font-bold ${item.risk_detected ? 'text-red-600' : 'text-emerald-600'}`}>{item.status}</td>
                     <td className="p-2.5">{item.confidence}%</td>
                   </tr>

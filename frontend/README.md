@@ -1,16 +1,86 @@
-# React + Vite
+# Medcentric AI - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite + Tailwind CSS frontend for the Medcentric AI cardiovascular risk assessment platform.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- ⚠️ **Clinical Disclaimer Banner**: Prominent amber-styled safety notice
+- 📊 **Interactive Risk Assessment Form**: Patient vitals input with validation
+- 📈 **Visual Risk Meter**: Dynamic gauge showing prediction confidence
+- 📋 **Session History Log**: Tabulated record of all assessments
+- 💾 **Report Export**: Download assessments as text files
+- 🎨 **Responsive Design**: Works on desktop, tablet, and mobile
+- 🔗 **Dynamic API Configuration**: Environment-based backend URL
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19.2.8**: Modern hooks and functional components
+- **Vite 8.3.0**: Lightning-fast build tool
+- **Tailwind CSS 3.4.19**: Utility-first styling
+- **PostCSS + Autoprefixer**: CSS processing
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Install Dependencies
+```bash
+npm install
+```
+
+### Development Server
+```bash
+npm run dev
+```
+Runs on `http://localhost:5173`
+
+### Production Build
+```bash
+npm run build
+```
+Output in `dist/` directory
+
+### Preview Production Build
+```bash
+npm run preview
+```
+
+## Environment Configuration
+
+Create a `.env.production` file for production deployment:
+```env
+VITE_API_URL=https://your-backend-url.onrender.com
+```
+
+During local development, the app defaults to `http://127.0.0.1:8000`.
+
+## Deployment
+
+### Vercel (Recommended)
+```bash
+vercel --prod
+```
+
+### Netlify
+```bash
+npm run build
+netlify deploy --prod --dir=dist
+```
+
+### Static Hosting
+Upload the `dist/` folder to any static host (AWS S3, GitHub Pages, etc.)
+
+## Project Structure
+
+```
+frontend/
+├── src/
+│   ├── App.jsx        # Main application component
+│   ├── main.jsx       # React entry point
+│   └── index.css      # Tailwind imports
+├── public/            # Static assets
+├── index.html         # HTML template
+└── vite.config.js     # Vite configuration
+```
+
+## License
+
+MIT License - see root README for details.
